@@ -36,7 +36,7 @@ void multiplica_ax(double** a, double* x, double* ax, int n){
   }
 }
 
-void calcula_residual_norma(double* b, double* ax, int n){
+double calcula_residual_norma(double* b, double* ax, int n){
   double *residual = (double*)malloc(n*sizeof(double));
   for(int i = 0; i < n; i++){
     residual[i] = b[i] - ax[i];
@@ -46,18 +46,25 @@ void calcula_residual_norma(double* b, double* ax, int n){
   for(int i = 0; i < n; i++){
     norma += pow(residual[i], 2.0);
   }
-  printf("Norma: %lf\n", pow(norma, 0.5));
+  norma = pow(norma, 0.5);
+  return norma;
 }
 
 int main(void) {
-  int n;
+  double norma;
+  int n, contador = 0;
   
   FILE *entrada;
-  entrada = fopen ("m1.in", "r");
+  entrada = fopen ("m2.in", "r");
   if (entrada == NULL)
-      return 0;
+    return 0;
 
   fscanf(entrada, "%d", &n);
+
+  double **a_original = (double **)malloc(n*sizeof(double*));
+  for(int i = 0; i < n; i++){
+    a_original[i] = (double*)malloc(n*sizeof(double));
+  }
 
   double **a = (double **)malloc(n*sizeof(double*));
   for(int i = 0; i < n; i++){
@@ -69,19 +76,38 @@ int main(void) {
   double *ax = (double*)malloc(n*sizeof(double));
 
   for(int i = 0; i < n; ++i){
-      for(int j = 0; j < n; ++j){
-          fscanf(entrada, "%lf", a[i] + j);
-      }
-      fscanf(entrada, "%lf", b + i);
+    for(int j = 0; j < n; ++j){
+      fscanf(entrada, "%lf", a_original[i] + j);
+    }
+    fscanf(entrada, "%lf", b + i);
   }
 
   fclose (entrada);
 
-  gauss(a, b, x, n);
+  for(int i = 0; i < n; ++i){
+    for(int j = 0; j < n; ++j){
+      a[i][j] = a_original[i][j];
+    }
+  }
 
-  multiplica_ax(a, x, ax, n);
+  while(contador < 150){
+    contador++;
 
-  calcula_residual_norma(b, ax, n);
+    gauss(a, b, x, n);
+
+    multiplica_ax(a, x, ax, n);
+
+    norma = calcula_residual_norma(b, ax, n);
+
+    printf("Norma: %lf\nNúmero de iteracoes: %d\n", norma, contador);
+    for(int i = 0; i < n; ++i){
+      for(int j = 0; j < n; ++j){
+        a[i][j] = a_original[i][j];
+      }
+      b[i] = ax[i];
+    }
+
+  }
 
   return 0;
 }
