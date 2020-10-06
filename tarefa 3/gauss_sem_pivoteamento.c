@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
-void gauss(double** a, double* b, int n){
-  double *x = (double*)malloc(n*sizeof(double));
+void gauss(double** a, double* b, double* x, int n){
   double m, soma;
   for(int k = 0; k < n-1; k++){
     for(int i = k+1; i <= n-1; i++){
@@ -22,11 +22,31 @@ void gauss(double** a, double* b, int n){
     }
     x[i] = (b[i] - soma)/a[i][i];
   }
-  printf("X: ");
-  for(int j = 0; j < n; j++){
-    printf("%lf ", x[j]);
+}
+
+void multiplica_ax(double** a, double* x, double* ax, int n){
+  for (int i = 0; i < n; i++) {
+    ax[i] = 0;
   }
-  printf("\n");
+
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      ax[i] += a[i][j] * x[j];
+    }
+  }
+}
+
+void calcula_residual_norma(double* b, double* ax, int n){
+  double *residual = (double*)malloc(n*sizeof(double));
+  for(int i = 0; i < n; i++){
+    residual[i] = b[i] - ax[i];
+  }
+  
+  double norma = 0;
+  for(int i = 0; i < n; i++){
+    norma += pow(residual[i], 2.0);
+  }
+  printf("Norma: %lf\n", pow(norma, 0.5));
 }
 
 int main(void) {
@@ -43,7 +63,10 @@ int main(void) {
   for(int i = 0; i < n; i++){
     a[i] = (double*)malloc(n*sizeof(double));
   }
+
   double *b = (double*)malloc(n*sizeof(double));
+  double *x = (double*)malloc(n*sizeof(double));
+  double *ax = (double*)malloc(n*sizeof(double));
 
   for(int i = 0; i < n; ++i){
       for(int j = 0; j < n; ++j){
@@ -54,7 +77,11 @@ int main(void) {
 
   fclose (entrada);
 
-  gauss(a, b, n);
+  gauss(a, b, x, n);
+
+  multiplica_ax(a, x, ax, n);
+
+  calcula_residual_norma(b, ax, n);
 
   return 0;
 }
