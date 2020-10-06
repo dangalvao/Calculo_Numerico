@@ -99,7 +99,7 @@ int main(void) {
 
     norma = calcula_residual_norma(b, ax, n);
 
-    printf("Norma: %lf\nNúmero de iteracoes: %d\n", norma, contador);
+    printf("Norma: %lf\nNumero de iteracoes: %d\n", norma, contador);
     for(int i = 0; i < n; ++i){
       for(int j = 0; j < n; ++j){
         a[i][j] = a_original[i][j];
